@@ -1,0 +1,6 @@
+secretGenerator:
+- name: postgres-pass
+  literals:
+  - password=password
+resources:
+  - postgres-deployment.yaml

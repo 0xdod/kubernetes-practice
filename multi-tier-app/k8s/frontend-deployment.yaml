@@ -1,0 +1,37 @@
+# https://kubernetes.io/docs/concepts/workloads/controllers/deployment/
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: demo-frontend
+  labels:
+    app: demo-frontend
+spec:
+  selector:
+    matchLabels:
+      tier: frontend  
+  replicas: 2
+  template:
+    metadata:
+      labels:
+        tier: frontend
+    spec:
+      containers:
+      - name: demo-frontend
+        image: 0xdod/demo-frontend:latest
+        ports:
+        - containerPort: 80
+      restartPolicy: Always
+---
+# https://kubernetes.io/docs/concepts/services-networking/service/
+apiVersion: v1
+kind: Service
+metadata:
+  name: demo-frontend
+spec:
+  selector:
+    tier: frontend
+  ports:
+  - port: 80
+    protocol: TCP
+---
+

@@ -1,0 +1,35 @@
+# https://kubernetes.io/docs/concepts/workloads/controllers/deployment/
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: demo-backend
+  labels:
+    app: demo-app
+spec:
+  selector:
+    matchLabels:
+      tier: backend  
+  replicas: 2
+  template:
+    metadata:
+      labels:
+        tier: backend
+    spec:
+      containers:
+      - name: demo-backend
+        image: 0xdod/demo-backend:latest
+        ports:
+        - containerPort: 8000
+      restartPolicy: Always
+---
+# https://kubernetes.io/docs/concepts/services-networking/service/
+apiVersion: v1
+kind: Service
+metadata:
+  name: demo-backend
+spec:
+  selector:
+    tier: backend
+  ports:
+  - port: 8000
+    targetPort: 8000

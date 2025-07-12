@@ -1,0 +1,64 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: demo-postgres
+  labels:
+    app: demo-app
+spec:
+  ports:
+    - port: 5432
+  selector:
+    tier: database
+  clusterIP: None
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: postgres-pvc
+  labels:
+    app: demo-app
+spec:
+  storageClassName: standard
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 8Gi
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: demo-database
+  labels:
+    app: demo-app
+spec:
+  selector:
+    matchLabels:
+      tier: database
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        tier: database
+    spec:
+      containers:
+      - image: "postgres:17"
+        name: postgres
+        env:
+        - name: POSTGRES_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: postgres-pass
+              key: password
+        ports:
+        - containerPort: 5432
+          name: postgres
+        volumeMounts:
+        - name: postgres-data
+          mountPath: /var/lib/postgresql
+      volumes:
+      - name: postgres-data
+        persistentVolumeClaim:
+          claimName: postgres-pvc
+
